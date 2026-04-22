@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "577861804801",
+    "project_id": "pokedex-field-assistant",
+    "storage_bucket": "pokedex-field-assistant.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:577861804801:android:c94a807f3c931779447100",
+        "android_client_info": {
+          "package_name": "com.pokedex.pokedex_field_assistant"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "577861804801-kele29trnapj9tul0pt0p12k7b7rvrli.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCB9QMdaJlw5JmzrCaUnO7uRMU-kYVAYY8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "577861804801-kele29trnapj9tul0pt0p12k7b7rvrli.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "577861804801-qi9ecraka39s8g7d41c0ess3glbu6lbm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.pokedex.pokedexFieldAssistant"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
