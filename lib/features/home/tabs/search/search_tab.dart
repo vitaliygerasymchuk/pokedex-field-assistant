@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../domain/models/pokemon_list_item.dart';
 import '../../../../injection.dart';
+import '../../widgets/pokemon_tile.dart';
 import 'search_cubit.dart';
 import 'search_state.dart';
 
@@ -96,7 +96,12 @@ class _SearchTabViewState extends State<_SearchTabView> {
             child: Center(child: CircularProgressIndicator()),
           );
         }
-        return _PokemonTile(item: state.items[i]);
+        final item = state.items[i];
+        return PokemonTile(
+          item: item,
+          onToggleBookmark: () =>
+              context.read<SearchCubit>().toggleBookmark(item),
+        );
       },
     );
   }
@@ -165,28 +170,6 @@ class _SearchTabViewState extends State<_SearchTabView> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _PokemonTile extends StatelessWidget {
-  const _PokemonTile({required this.item});
-
-  final PokemonListItem item;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: Image.network(
-        item.spriteUrl,
-        width: 48,
-        height: 48,
-        errorBuilder: (_, __, ___) =>
-            const Icon(Icons.image_not_supported_outlined),
-      ),
-      title: Text(item.name),
-      trailing: Text('#${item.id.toString().padLeft(3, '0')}'),
-      onTap: () {},
     );
   }
 }

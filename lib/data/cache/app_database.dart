@@ -2,13 +2,14 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:injectable/injectable.dart';
 
+import 'tables/bookmark_entity.dart';
 import 'tables/cache_metadata_entity.dart';
 import 'tables/pokemon_index_entity.dart';
 
 part 'app_database.g.dart';
 
 @lazySingleton
-@DriftDatabase(tables: [PokemonIndexEntity, CacheMetadataEntity])
+@DriftDatabase(tables: [PokemonIndexEntity, CacheMetadataEntity, BookmarkEntity])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: 'pokedex'));
 
@@ -32,24 +33,39 @@ class AppDatabase extends _$AppDatabase {
     return row.read(pokemonIndexEntity.id.count()) ?? 0;
   }
 
-  Stream<List<PokemonIndexEntityData>> watchPokemon({
+  Stream<List<({PokemonIndexEntityData pokemon, bool bookmarked})>>
+      watchPokemon({
     String query = '',
     Set<int>? idWhitelist,
     int offset = 0,
     int limit = 100,
   }) {
-    final q = select(pokemonIndexEntity);
+    final q = select(pokemonIndexEntity).join([
+      leftOuterJoin(
+        bookmarkEntity,
+        bookmarkEntity.id.equalsExp(pokemonIndexEntity.id),
+      ),
+    ]);
     final trimmed = query.trim().toLowerCase();
     if (trimmed.isNotEmpty) {
-      q.where((t) => t.name.like('%$trimmed%'));
+      q.where(pokemonIndexEntity.name.like('%$trimmed%'));
     }
     if (idWhitelist != null) {
-      q.where((t) => t.id.isIn(idWhitelist));
+      q.where(pokemonIndexEntity.id.isIn(idWhitelist));
     }
     q
-      ..orderBy([(t) => OrderingTerm.asc(t.id)])
+      ..orderBy([OrderingTerm.asc(pokemonIndexEntity.id)])
       ..limit(limit, offset: offset);
-    return q.watch();
+    return q.watch().map(
+          (rows) => rows
+              .map(
+                (r) => (
+                  pokemon: r.readTable(pokemonIndexEntity),
+                  bookmarked: r.readTableOrNull(bookmarkEntity) != null,
+                ),
+              )
+              .toList(),
+        );
   }
 
   Future<DateTime?> cacheUpdatedAt(String key) async {
@@ -66,5 +82,37 @@ class AppDatabase extends _$AppDatabase {
         updatedAt: DateTime.now(),
       ),
     );
+  }
+
+  Stream<List<PokemonIndexEntityData>> watchBookmarks() {
+    final q = select(bookmarkEntity).join([
+      innerJoin(
+        pokemonIndexEntity,
+        pokemonIndexEntity.id.equalsExp(bookmarkEntity.id),
+      ),
+    ]);
+    q.orderBy([OrderingTerm.desc(bookmarkEntity.bookmarkedAt)]);
+    return q.watch().map(
+          (rows) => rows.map((r) => r.readTable(pokemonIndexEntity)).toList(),
+        );
+  }
+
+  Future<bool> toggleBookmark({required int id}) {
+    return transaction(() async {
+      final existing = await (select(bookmarkEntity)
+            ..where((t) => t.id.equals(id)))
+          .getSingleOrNull();
+      if (existing != null) {
+        await (delete(bookmarkEntity)..where((t) => t.id.equals(id))).go();
+        return false;
+      }
+      await into(bookmarkEntity).insert(
+        BookmarkEntityCompanion.insert(
+          id: Value(id),
+          bookmarkedAt: DateTime.now(),
+        ),
+      );
+      return true;
+    });
   }
 }
