@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pokedex_field_assistant/features/home/tabs/search/search_tab.dart';
 
 import '../auth/auth_screen.dart';
-import 'tabs/bookmarks_tab.dart';
+import 'tabs/bookmarks/bookmarks_tab.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

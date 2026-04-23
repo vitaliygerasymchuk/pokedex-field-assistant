@@ -12,12 +12,16 @@
 import 'package:dio/dio.dart' as _i361;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:pokedex_field_assistant/data/bookmarks/bookmarks_repository.dart'
+    as _i570;
 import 'package:pokedex_field_assistant/data/cache/app_database.dart' as _i878;
 import 'package:pokedex_field_assistant/data/pokeapi/pokeapi_repository.dart'
     as _i961;
 import 'package:pokedex_field_assistant/di/dio_module.dart' as _i874;
 import 'package:pokedex_field_assistant/domain/weather_to_type_mapper.dart'
     as _i844;
+import 'package:pokedex_field_assistant/features/home/tabs/bookmarks/bookmarks_cubit.dart'
+    as _i76;
 import 'package:pokedex_field_assistant/features/home/tabs/search/search_cubit.dart'
     as _i403;
 
@@ -34,6 +38,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i844.WeatherToTypeMapper>(
       () => const _i844.WeatherToTypeMapper(),
     );
+    gh.lazySingleton<_i570.BookmarksRepository>(
+      () => _i570.BookmarksRepositoryImpl(gh<_i878.AppDatabase>()),
+    );
+    gh.factory<_i76.BookmarksCubit>(
+      () => _i76.BookmarksCubit(gh<_i570.BookmarksRepository>()),
+    );
     gh.lazySingleton<_i961.PokeapiRepository>(
       () => _i961.PokeapiRepositoryImpl(
         gh<_i361.Dio>(),
@@ -42,7 +52,10 @@ extension GetItInjectableX on _i174.GetIt {
       ),
     );
     gh.factory<_i403.SearchCubit>(
-      () => _i403.SearchCubit(gh<_i961.PokeapiRepository>()),
+      () => _i403.SearchCubit(
+        gh<_i961.PokeapiRepository>(),
+        gh<_i570.BookmarksRepository>(),
+      ),
     );
     return this;
   }

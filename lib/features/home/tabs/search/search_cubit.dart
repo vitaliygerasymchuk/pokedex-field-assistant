@@ -4,6 +4,7 @@ import 'dart:developer' as developer;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../../data/bookmarks/bookmarks_repository.dart';
 import '../../../../data/pokeapi/pokeapi_repository.dart';
 import '../../../../domain/models/pokemon_list_item.dart';
 import '../../../../domain/result.dart';
@@ -11,7 +12,8 @@ import 'search_state.dart';
 
 @injectable
 class SearchCubit extends Cubit<SearchState> {
-  SearchCubit(this._repo) : super(const SearchState(isLoading: true)) {
+  SearchCubit(this._pokeapiRepository, this._bookmarksRepository)
+      : super(const SearchState(isLoading: true)) {
     _log('created');
     _subscribe();
     _sync();
@@ -21,7 +23,8 @@ class SearchCubit extends Cubit<SearchState> {
   static const _pageSize = 100;
   static const _searchDebounce = Duration(milliseconds: 300);
 
-  final PokeapiRepository _repo;
+  final PokeapiRepository _pokeapiRepository;
+  final BookmarksRepository _bookmarksRepository;
   StreamSubscription<List<PokemonListItem>>? _sub;
   Timer? _queryDebounce;
   int _limit = _pageSize;
@@ -33,7 +36,7 @@ class SearchCubit extends Cubit<SearchState> {
 
   Future<void> _sync() async {
     _log('sync start');
-    final result = await _repo.syncAll();
+    final result = await _pokeapiRepository.syncAll();
     switch (result) {
       case Success(:final data):
         _log('sync ok rows=$data');
@@ -47,7 +50,7 @@ class SearchCubit extends Cubit<SearchState> {
     _sub?.cancel();
     final whitelistSize = state.weatherFilter?.ids.length;
     _log('subscribe query="${state.query}" whitelist=$whitelistSize limit=$_limit');
-    _sub = _repo
+    _sub = _pokeapiRepository
         .watchPokemon(
           query: state.query,
           idWhitelist: state.weatherFilter?.ids,
@@ -103,7 +106,7 @@ class SearchCubit extends Cubit<SearchState> {
   }) async {
     _log('applyWeather temp=$temperatureCelsius wind=$windSpeedMps');
     _safeEmit(state.copyWith(isLoading: true, clearError: true));
-    final result = await _repo.suggestByWeather(
+    final result = await _pokeapiRepository.suggestByWeather(
       temperatureCelsius: temperatureCelsius,
       windSpeedMps: windSpeedMps,
     );
@@ -148,10 +151,15 @@ class SearchCubit extends Cubit<SearchState> {
     _subscribe();
   }
 
+  Future<void> toggleBookmark(PokemonListItem item) async {
+    _log('toggleBookmark id=${item.id}');
+    await _bookmarksRepository.toggleBookmark(id: item.id);
+  }
+
   Future<void> refresh() async {
     _log('refresh');
     _safeEmit(state.copyWith(clearError: true));
-    final result = await _repo.syncAll(force: true);
+    final result = await _pokeapiRepository.syncAll(force: true);
     if (isClosed) return;
     switch (result) {
       case Success(:final data):

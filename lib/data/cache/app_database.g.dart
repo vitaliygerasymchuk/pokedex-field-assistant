@@ -419,6 +419,211 @@ class CacheMetadataEntityCompanion
   }
 }
 
+class $BookmarkEntityTable extends BookmarkEntity
+    with TableInfo<$BookmarkEntityTable, BookmarkEntityData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BookmarkEntityTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bookmarkedAtMeta = const VerificationMeta(
+    'bookmarkedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> bookmarkedAt = GeneratedColumn<DateTime>(
+    'bookmarked_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, bookmarkedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'bookmark_entity';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BookmarkEntityData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('bookmarked_at')) {
+      context.handle(
+        _bookmarkedAtMeta,
+        bookmarkedAt.isAcceptableOrUnknown(
+          data['bookmarked_at']!,
+          _bookmarkedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_bookmarkedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BookmarkEntityData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BookmarkEntityData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      bookmarkedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}bookmarked_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BookmarkEntityTable createAlias(String alias) {
+    return $BookmarkEntityTable(attachedDatabase, alias);
+  }
+}
+
+class BookmarkEntityData extends DataClass
+    implements Insertable<BookmarkEntityData> {
+  final int id;
+  final DateTime bookmarkedAt;
+  const BookmarkEntityData({required this.id, required this.bookmarkedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['bookmarked_at'] = Variable<DateTime>(bookmarkedAt);
+    return map;
+  }
+
+  BookmarkEntityCompanion toCompanion(bool nullToAbsent) {
+    return BookmarkEntityCompanion(
+      id: Value(id),
+      bookmarkedAt: Value(bookmarkedAt),
+    );
+  }
+
+  factory BookmarkEntityData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BookmarkEntityData(
+      id: serializer.fromJson<int>(json['id']),
+      bookmarkedAt: serializer.fromJson<DateTime>(json['bookmarkedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'bookmarkedAt': serializer.toJson<DateTime>(bookmarkedAt),
+    };
+  }
+
+  BookmarkEntityData copyWith({int? id, DateTime? bookmarkedAt}) =>
+      BookmarkEntityData(
+        id: id ?? this.id,
+        bookmarkedAt: bookmarkedAt ?? this.bookmarkedAt,
+      );
+  BookmarkEntityData copyWithCompanion(BookmarkEntityCompanion data) {
+    return BookmarkEntityData(
+      id: data.id.present ? data.id.value : this.id,
+      bookmarkedAt: data.bookmarkedAt.present
+          ? data.bookmarkedAt.value
+          : this.bookmarkedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BookmarkEntityData(')
+          ..write('id: $id, ')
+          ..write('bookmarkedAt: $bookmarkedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, bookmarkedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BookmarkEntityData &&
+          other.id == this.id &&
+          other.bookmarkedAt == this.bookmarkedAt);
+}
+
+class BookmarkEntityCompanion extends UpdateCompanion<BookmarkEntityData> {
+  final Value<int> id;
+  final Value<DateTime> bookmarkedAt;
+  const BookmarkEntityCompanion({
+    this.id = const Value.absent(),
+    this.bookmarkedAt = const Value.absent(),
+  });
+  BookmarkEntityCompanion.insert({
+    this.id = const Value.absent(),
+    required DateTime bookmarkedAt,
+  }) : bookmarkedAt = Value(bookmarkedAt);
+  static Insertable<BookmarkEntityData> custom({
+    Expression<int>? id,
+    Expression<DateTime>? bookmarkedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (bookmarkedAt != null) 'bookmarked_at': bookmarkedAt,
+    });
+  }
+
+  BookmarkEntityCompanion copyWith({
+    Value<int>? id,
+    Value<DateTime>? bookmarkedAt,
+  }) {
+    return BookmarkEntityCompanion(
+      id: id ?? this.id,
+      bookmarkedAt: bookmarkedAt ?? this.bookmarkedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (bookmarkedAt.present) {
+      map['bookmarked_at'] = Variable<DateTime>(bookmarkedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BookmarkEntityCompanion(')
+          ..write('id: $id, ')
+          ..write('bookmarkedAt: $bookmarkedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -426,6 +631,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $PokemonIndexEntityTable(this);
   late final $CacheMetadataEntityTable cacheMetadataEntity =
       $CacheMetadataEntityTable(this);
+  late final $BookmarkEntityTable bookmarkEntity = $BookmarkEntityTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -433,6 +639,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     pokemonIndexEntity,
     cacheMetadataEntity,
+    bookmarkEntity,
   ];
 }
 
@@ -731,6 +938,148 @@ typedef $$CacheMetadataEntityTableProcessedTableManager =
       CacheMetadataEntityData,
       PrefetchHooks Function()
     >;
+typedef $$BookmarkEntityTableCreateCompanionBuilder =
+    BookmarkEntityCompanion Function({
+      Value<int> id,
+      required DateTime bookmarkedAt,
+    });
+typedef $$BookmarkEntityTableUpdateCompanionBuilder =
+    BookmarkEntityCompanion Function({
+      Value<int> id,
+      Value<DateTime> bookmarkedAt,
+    });
+
+class $$BookmarkEntityTableFilterComposer
+    extends Composer<_$AppDatabase, $BookmarkEntityTable> {
+  $$BookmarkEntityTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get bookmarkedAt => $composableBuilder(
+    column: $table.bookmarkedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BookmarkEntityTableOrderingComposer
+    extends Composer<_$AppDatabase, $BookmarkEntityTable> {
+  $$BookmarkEntityTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get bookmarkedAt => $composableBuilder(
+    column: $table.bookmarkedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BookmarkEntityTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BookmarkEntityTable> {
+  $$BookmarkEntityTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get bookmarkedAt => $composableBuilder(
+    column: $table.bookmarkedAt,
+    builder: (column) => column,
+  );
+}
+
+class $$BookmarkEntityTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BookmarkEntityTable,
+          BookmarkEntityData,
+          $$BookmarkEntityTableFilterComposer,
+          $$BookmarkEntityTableOrderingComposer,
+          $$BookmarkEntityTableAnnotationComposer,
+          $$BookmarkEntityTableCreateCompanionBuilder,
+          $$BookmarkEntityTableUpdateCompanionBuilder,
+          (
+            BookmarkEntityData,
+            BaseReferences<
+              _$AppDatabase,
+              $BookmarkEntityTable,
+              BookmarkEntityData
+            >,
+          ),
+          BookmarkEntityData,
+          PrefetchHooks Function()
+        > {
+  $$BookmarkEntityTableTableManager(
+    _$AppDatabase db,
+    $BookmarkEntityTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BookmarkEntityTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BookmarkEntityTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BookmarkEntityTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> bookmarkedAt = const Value.absent(),
+              }) => BookmarkEntityCompanion(id: id, bookmarkedAt: bookmarkedAt),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required DateTime bookmarkedAt,
+              }) => BookmarkEntityCompanion.insert(
+                id: id,
+                bookmarkedAt: bookmarkedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BookmarkEntityTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BookmarkEntityTable,
+      BookmarkEntityData,
+      $$BookmarkEntityTableFilterComposer,
+      $$BookmarkEntityTableOrderingComposer,
+      $$BookmarkEntityTableAnnotationComposer,
+      $$BookmarkEntityTableCreateCompanionBuilder,
+      $$BookmarkEntityTableUpdateCompanionBuilder,
+      (
+        BookmarkEntityData,
+        BaseReferences<_$AppDatabase, $BookmarkEntityTable, BookmarkEntityData>,
+      ),
+      BookmarkEntityData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -739,4 +1088,6 @@ class $AppDatabaseManager {
       $$PokemonIndexEntityTableTableManager(_db, _db.pokemonIndexEntity);
   $$CacheMetadataEntityTableTableManager get cacheMetadataEntity =>
       $$CacheMetadataEntityTableTableManager(_db, _db.cacheMetadataEntity);
+  $$BookmarkEntityTableTableManager get bookmarkEntity =>
+      $$BookmarkEntityTableTableManager(_db, _db.bookmarkEntity);
 }

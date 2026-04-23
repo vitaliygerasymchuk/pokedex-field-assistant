@@ -97,8 +97,17 @@ class PokeapiRepositoryImpl implements PokeapiRepository {
           offset: offset,
           limit: limit,
         )
-        .map((rows) =>
-            rows.map((r) => PokemonListItem(id: r.id, name: r.name)).toList());
+        .map(
+          (rows) => rows
+              .map(
+                (r) => PokemonListItem(
+                  id: r.pokemon.id,
+                  name: r.pokemon.name,
+                  isBookmarked: r.bookmarked,
+                ),
+              )
+              .toList(),
+        );
   }
 
   @override
