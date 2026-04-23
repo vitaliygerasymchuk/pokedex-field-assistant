@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'features/auth/auth_screen.dart';
+import 'features/home/home_screen.dart';
 import 'injection.dart';
 
 Future<void> main() async {
@@ -20,7 +20,7 @@ class PokedexApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const AuthScreen(),
+      home: const HomeScreen(),
     );
   }
 }

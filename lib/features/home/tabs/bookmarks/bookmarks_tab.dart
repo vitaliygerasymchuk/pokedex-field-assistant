@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../injection.dart';
+import '../../../pokemon_details/pokemon_details_screen.dart';
 import '../../widgets/pokemon_tile.dart';
 import 'bookmarks_cubit.dart';
 import 'bookmarks_state.dart';
@@ -46,6 +47,12 @@ class _BookmarksTabView extends StatelessWidget {
                 item: item,
                 onToggleBookmark: () =>
                     context.read<BookmarksCubit>().toggleBookmark(item),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    fullscreenDialog: true,
+                    builder: (_) => PokemonDetailsScreen(item: item),
+                  ),
+                ),
               );
             },
           );

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../injection.dart';
+import '../../../../widgets/error_retry_view.dart';
+import '../../../pokemon_details/pokemon_details_screen.dart';
 import '../../widgets/pokemon_tile.dart';
 import 'search_cubit.dart';
 import 'search_state.dart';
+import 'weather_picker_dialog.dart';
 
 class SearchTab extends StatelessWidget {
   const SearchTab({super.key});
@@ -51,6 +54,16 @@ class _SearchTabViewState extends State<_SearchTabView> {
     }
   }
 
+  Future<void> _pickWeather(BuildContext context) async {
+    final cubit = context.read<SearchCubit>();
+    final pick = await WeatherPickerDialog.show(context);
+    if (pick == null) return;
+    cubit.applyWeather(
+      temperatureCelsius: pick.temperatureCelsius,
+      windSpeedMps: pick.windSpeedMps,
+    );
+  }
+
   Widget _buildListBody(BuildContext context, SearchState state) {
     if (state.isLoading && state.items.isEmpty) {
       return ListView(
@@ -68,7 +81,10 @@ class _SearchTabViewState extends State<_SearchTabView> {
         padding: EdgeInsets.zero,
         children: [
           const SizedBox(height: 120),
-          _ErrorView(onRetry: context.read<SearchCubit>().refresh),
+          ErrorRetryView(
+            message: 'Failed to load Pokémon',
+            onRetry: context.read<SearchCubit>().refresh,
+          ),
         ],
       );
     }
@@ -101,6 +117,12 @@ class _SearchTabViewState extends State<_SearchTabView> {
           item: item,
           onToggleBookmark: () =>
               context.read<SearchCubit>().toggleBookmark(item),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              fullscreenDialog: true,
+              builder: (_) => PokemonDetailsScreen(item: item),
+            ),
+          ),
         );
       },
     );
@@ -136,10 +158,7 @@ class _SearchTabViewState extends State<_SearchTabView> {
                 return ActionChip(
                   avatar: const Icon(Icons.cloud_outlined, size: 18),
                   label: const Text('Suggest by Weather'),
-                  onPressed: () => context.read<SearchCubit>().applyWeather(
-                        temperatureCelsius: 22,
-                        windSpeedMps: 4,
-                      ),
+                  onPressed: () => _pickWeather(context),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                     side: BorderSide(color: Colors.grey.shade300),
@@ -168,28 +187,6 @@ class _SearchTabViewState extends State<_SearchTabView> {
               },
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.onRetry});
-
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.cloud_off, size: 48),
-          const SizedBox(height: 8),
-          const Text('Failed to load Pokémon'),
-          const SizedBox(height: 8),
-          FilledButton(onPressed: onRetry, child: const Text('Retry')),
         ],
       ),
     );
