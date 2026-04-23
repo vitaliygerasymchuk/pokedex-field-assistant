@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../core/strings.dart';
 import '../../data/bookmarks/bookmarks_repository.dart';
 import '../../domain/models/pokemon_details.dart';
 import '../../domain/models/pokemon_list_item.dart';
@@ -133,7 +134,7 @@ class _HeroCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
       ),
       child: Text(
-        _capitalize(type),
+        type.capitalized,
         style: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.w600,
@@ -233,7 +234,7 @@ class _AbilitiesCard extends StatelessWidget {
                       color: Colors.deepPurple.shade50,
                       borderRadius: BorderRadius.circular(24),
                     ),
-                    child: Text(_capitalize(a.replaceAll('-', ' '))),
+                    child: Text(a.capitalized),
                   ),
                 )
                 .toList(),
@@ -285,7 +286,7 @@ class _StatRow extends StatelessWidget {
       children: [
         SizedBox(
           width: 110,
-          child: Text(_capitalize(name.replaceAll('-', ' '))),
+          child: Text(name.capitalized),
         ),
         SizedBox(width: 40, child: Text('$value')),
         Expanded(
@@ -323,6 +324,3 @@ class _Card extends StatelessWidget {
     );
   }
 }
-
-String _capitalize(String s) =>
-    s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
