@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:drift/drift.dart';
 import 'package:injectable/injectable.dart';
@@ -10,7 +12,13 @@ import '../../domain/weather_to_type_mapper.dart';
 import '../cache/app_database.dart';
 
 abstract class PokeapiRepository {
-  Future<Result<PokemonDetails>> details(int id);
+  Future<Result<void>> syncDetails(
+    int id, {
+    bool force = false,
+    Duration ttl = const Duration(hours: 24),
+  });
+
+  Stream<PokemonDetails?> watchDetails(int id);
 
   Future<Result<int>> syncAll({
     bool force = false,
@@ -42,10 +50,52 @@ class PokeapiRepositoryImpl implements PokeapiRepository {
   final WeatherToTypeMapper _weatherMapper;
 
   @override
-  Future<Result<PokemonDetails>> details(int id) {
+  Future<Result<void>> syncDetails(
+    int id, {
+    bool force = false,
+    Duration ttl = const Duration(hours: 24),
+  }) {
     return Result.guard(() async {
+      if (!force) {
+        final cached = await _db.getPokemonDetailsById(id);
+        if (cached != null &&
+            DateTime.now().difference(cached.updatedAt) < ttl) {
+          return;
+        }
+      }
       final response = await _dio.get<Map<String, dynamic>>('/pokemon/$id');
-      return PokemonDetails.fromJson(response.data!);
+      final details = PokemonDetails.fromJson(response.data!);
+      await _db.upsertPokemonDetails(
+        PokemonDetailsEntityCompanion.insert(
+          id: Value(details.id),
+          name: details.name,
+          spriteUrl: details.spriteUrl,
+          heightDm: details.heightDm,
+          weightHg: details.weightHg,
+          typesJson: jsonEncode(details.types),
+          abilitiesJson: jsonEncode(details.abilities),
+          statsJson: jsonEncode(details.stats),
+          updatedAt: DateTime.now(),
+        ),
+      );
+    });
+  }
+
+  @override
+  Stream<PokemonDetails?> watchDetails(int id) {
+    return _db.watchPokemonDetails(id).map((row) {
+      if (row == null) return null;
+      return PokemonDetails(
+        id: row.id,
+        name: row.name,
+        spriteUrl: row.spriteUrl,
+        heightDm: row.heightDm,
+        weightHg: row.weightHg,
+        types: (jsonDecode(row.typesJson) as List).cast<String>(),
+        abilities: (jsonDecode(row.abilitiesJson) as List).cast<String>(),
+        stats: (jsonDecode(row.statsJson) as Map<String, dynamic>)
+            .map((k, v) => MapEntry(k, v as int)),
+      );
     });
   }
 

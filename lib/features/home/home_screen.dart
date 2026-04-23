@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pokedex_field_assistant/features/home/tabs/search/search_tab.dart';
 
-import '../auth/auth_screen.dart';
 import 'tabs/bookmarks/bookmarks_tab.dart';
+import 'tabs/search/search_tab.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,18 +15,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   static const _tabs = <Widget>[SearchTab(), BookmarksTab()];
 
-  void _logout() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const AuthScreen()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: [
-          _TopBar(onLogout: _logout),
+          const _TopBar(),
           Expanded(child: _tabs[_tabIndex]),
         ],
       ),
@@ -36,7 +29,10 @@ class _HomeScreenState extends State<HomeScreen> {
         onDestinationSelected: (i) => setState(() => _tabIndex = i),
         destinations: const [
           NavigationDestination(icon: Icon(Icons.search), label: 'Search'),
-          NavigationDestination(icon: Icon(Icons.bookmark_border), label: 'Bookmarks'),
+          NavigationDestination(
+            icon: Icon(Icons.bookmark_border),
+            label: 'Bookmarks',
+          ),
         ],
       ),
     );
@@ -44,9 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _TopBar extends StatelessWidget {
-  const _TopBar({required this.onLogout});
-
-  final VoidCallback onLogout;
+  const _TopBar();
 
   @override
   Widget build(BuildContext context) {
@@ -55,18 +49,18 @@ class _TopBar extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(
         16,
         MediaQuery.of(context).padding.top + 12,
-        8,
+        16,
         16,
       ),
-      child: Row(
+      child: const Row(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 20,
             backgroundColor: Colors.white,
             child: Icon(Icons.catching_pokemon, color: Colors.deepPurple),
           ),
-          const SizedBox(width: 12),
-          const Expanded(
+          SizedBox(width: 12),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -84,10 +78,6 @@ class _TopBar extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            onPressed: onLogout,
           ),
         ],
       ),

@@ -4,12 +4,20 @@ import 'package:injectable/injectable.dart';
 
 import 'tables/bookmark_entity.dart';
 import 'tables/cache_metadata_entity.dart';
+import 'tables/pokemon_details_entity.dart';
 import 'tables/pokemon_index_entity.dart';
 
 part 'app_database.g.dart';
 
 @lazySingleton
-@DriftDatabase(tables: [PokemonIndexEntity, CacheMetadataEntity, BookmarkEntity])
+@DriftDatabase(
+  tables: [
+    PokemonIndexEntity,
+    CacheMetadataEntity,
+    BookmarkEntity,
+    PokemonDetailsEntity,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: 'pokedex'));
 
@@ -95,6 +103,20 @@ class AppDatabase extends _$AppDatabase {
     return q.watch().map(
           (rows) => rows.map((r) => r.readTable(pokemonIndexEntity)).toList(),
         );
+  }
+
+  Future<void> upsertPokemonDetails(PokemonDetailsEntityCompanion row) {
+    return into(pokemonDetailsEntity).insertOnConflictUpdate(row);
+  }
+
+  Future<PokemonDetailsEntityData?> getPokemonDetailsById(int id) {
+    return (select(pokemonDetailsEntity)..where((t) => t.id.equals(id)))
+        .getSingleOrNull();
+  }
+
+  Stream<PokemonDetailsEntityData?> watchPokemonDetails(int id) {
+    return (select(pokemonDetailsEntity)..where((t) => t.id.equals(id)))
+        .watchSingleOrNull();
   }
 
   Future<bool> toggleBookmark({required int id}) {

@@ -24,6 +24,8 @@ import 'package:pokedex_field_assistant/features/home/tabs/bookmarks/bookmarks_c
     as _i76;
 import 'package:pokedex_field_assistant/features/home/tabs/search/search_cubit.dart'
     as _i403;
+import 'package:pokedex_field_assistant/features/pokemon_details/pokemon_details_cubit.dart'
+    as _i779;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -50,6 +52,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i878.AppDatabase>(),
         gh<_i844.WeatherToTypeMapper>(),
       ),
+    );
+    gh.factoryParam<_i779.PokemonDetailsCubit, int, dynamic>(
+      (_id, _) => _i779.PokemonDetailsCubit(gh<_i961.PokeapiRepository>(), _id),
     );
     gh.factory<_i403.SearchCubit>(
       () => _i403.SearchCubit(
