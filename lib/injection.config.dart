@@ -18,6 +18,8 @@ import 'package:pokedex_field_assistant/data/pokeapi/pokeapi_repository.dart'
 import 'package:pokedex_field_assistant/di/dio_module.dart' as _i874;
 import 'package:pokedex_field_assistant/domain/weather_to_type_mapper.dart'
     as _i844;
+import 'package:pokedex_field_assistant/features/home/tabs/search/search_cubit.dart'
+    as _i403;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -38,6 +40,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i878.AppDatabase>(),
         gh<_i844.WeatherToTypeMapper>(),
       ),
+    );
+    gh.factory<_i403.SearchCubit>(
+      () => _i403.SearchCubit(gh<_i961.PokeapiRepository>()),
     );
     return this;
   }
