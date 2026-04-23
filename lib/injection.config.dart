@@ -9,8 +9,15 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:dio/dio.dart' as _i361;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:pokedex_field_assistant/data/cache/app_database.dart' as _i878;
+import 'package:pokedex_field_assistant/data/pokeapi/pokeapi_repository.dart'
+    as _i961;
+import 'package:pokedex_field_assistant/di/dio_module.dart' as _i874;
+import 'package:pokedex_field_assistant/domain/weather_to_type_mapper.dart'
+    as _i844;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -18,7 +25,22 @@ extension GetItInjectableX on _i174.GetIt {
     String? environment,
     _i526.EnvironmentFilter? environmentFilter,
   }) {
-    _i526.GetItHelper(this, environment, environmentFilter);
+    final gh = _i526.GetItHelper(this, environment, environmentFilter);
+    final dioModule = _$DioModule();
+    gh.lazySingleton<_i878.AppDatabase>(() => _i878.AppDatabase());
+    gh.lazySingleton<_i361.Dio>(() => dioModule.dio());
+    gh.lazySingleton<_i844.WeatherToTypeMapper>(
+      () => const _i844.WeatherToTypeMapper(),
+    );
+    gh.lazySingleton<_i961.PokeapiRepository>(
+      () => _i961.PokeapiRepositoryImpl(
+        gh<_i361.Dio>(),
+        gh<_i878.AppDatabase>(),
+        gh<_i844.WeatherToTypeMapper>(),
+      ),
+    );
     return this;
   }
 }
+
+class _$DioModule extends _i874.DioModule {}
