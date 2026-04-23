@@ -17,6 +17,8 @@ Things to improve:
 2) Add auth (Firebase already connected)
 3) Unit test
 4) UI test
+5) Add firebase app distribution
+6) Configure CI
 
 ## Requirements
 
