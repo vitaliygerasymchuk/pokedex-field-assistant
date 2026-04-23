@@ -10,7 +10,7 @@ PokeAPI has no name-search endpoint (see https://github.com/PokeAPI/pokeapi/issu
 
 The app is offline-friendly. The pokemon details are cached upon entering the page (without the internet if not cached will show the corresponding state with Retry button).
 
-Also, due to the luck of time - i didn't cover anything with unit/ui tests. But this is easy doable, because core data layers are interfaced and can be mocked.
+Also, due to the luck of time - i didn't cover anything with unit/ui tests. But this is easy doable, because core data layers are interfaced and can be mocked. Also i tried to keep the ui in small elements.
 
 Things to improve:
 1) Remember scroll state of the tabs
